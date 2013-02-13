@@ -14,13 +14,12 @@
 #states {
   fill: rgb(188, 189, 220);
   stroke: #fff;
-  stroke-width: 1.25px;
-  opacity: 0.85;
+  stroke-width: 1px;
+  opacity: 0.90;
 }
 
 #states .active {
-  /*fill: lightblue;*/
-  fill: rgb(117, 107, 177);
+  /*stroke-width: 1.5px;*/
 }
 
 .graticuleLine {
@@ -35,8 +34,8 @@
 <h3>Bundesländer, Deutschland</h3>
 
 <script>
-var width = 700,
-    height = 900,
+var width = 600,
+    height = 700,
     focused = null,
     geoPath;
 
@@ -72,20 +71,16 @@ d3.json("./dataBundesLander.json", function(collection) {
         
       bottomLeftPx = projection(bottomLeft),
       topRightPx = projection(topRight),
-      scaleFactor = 1.00*Math.min(width/(topRightPx[0]-bottomLeftPx[0]), height/(-topRightPx[1]+bottomLeftPx[1])),
+      scaleFactor = 0.95*Math.min(width/(topRightPx[0]-bottomLeftPx[0]), height/(-topRightPx[1]+bottomLeftPx[1])),
       
-      projection = d3.geo.albers()
-        .parallels([bottomLeft[1],topRight[1]])
-        .rotate([rotLong,0,0])
-        .translate([width/2,height/2])
-        .scale(scaleFactor*0.975*1000)
-        //.scale(4*1000)  //1000 is default for USA map
-        .center(center);
+  projection.scale(scaleFactor*1000); 
 
   geoPath = d3.geo.path().projection(projection);
     
   var graticule = d3.geo.graticule()
       .step([1, 1]);
+
+  var fill = d3.scale.category20b();
 
   g.append("path")
       .datum(graticule)
@@ -96,22 +91,22 @@ d3.json("./dataBundesLander.json", function(collection) {
       .data(collection.features)
       .enter()
     .append("path")
-      .attr("class", "feature")
+      //.attr("fill", function (d) {return fill(d.properties.ID_1)})
       .attr("d", geoPath)
       .on("click", clickPath);
 
-  console.log("d3.json: bounds = "+bounds);
-  console.log("d3.json: bottomLeft = "+bottomLeft);
-  console.log("d3.json: topRight = "+topRight);
-  console.log("d3.json: center = "+center);
-  console.log("d3.json: projection(center) = "+projection(center));
-  console.log("d3.json: projection(bottomLeft) = "+projection(bottomLeft));
-  console.log("d3.json: projection(topRight) = "+projection(topRight));
-  console.log("d3.json: topRightPx = "+topRightPx);
-  console.log("d3.json: bottomLeftPx = "+bottomLeftPx);
-  console.log("d3.json: scaleFactor x axis = "+width/(topRightPx[0]-bottomLeftPx[0]));
-  console.log("d3.json: scaleFactor y axis = "+height/(-topRightPx[1]+bottomLeftPx[1]));  
-  console.log("d3.json: scaleFactor = "+scaleFactor);
+  // console.log("d3.json: bounds = "+bounds);
+  // console.log("d3.json: bottomLeft = "+bottomLeft);
+  // console.log("d3.json: topRight = "+topRight);
+  // console.log("d3.json: center = "+center);
+  // console.log("d3.json: projection(center) = "+projection(center));
+  // console.log("d3.json: projection(bottomLeft) = "+projection(bottomLeft));
+  // console.log("d3.json: projection(topRight) = "+projection(topRight));
+  // console.log("d3.json: topRightPx = "+topRightPx);
+  // console.log("d3.json: bottomLeftPx = "+bottomLeftPx);
+  // console.log("d3.json: scaleFactor x axis = "+width/(topRightPx[0]-bottomLeftPx[0]));
+  // console.log("d3.json: scaleFactor y axis = "+height/(-topRightPx[1]+bottomLeftPx[1]));  
+  // console.log("d3.json: scaleFactor = "+scaleFactor);
 });
 
 
@@ -127,7 +122,7 @@ function clickPath(d) {
     var centroid = geoPath.centroid(d),
         x = +centroid[0],
         y = +centroid[1],
-        k = 1.75;
+        k = 2;
     focused = d;
     
     g.append("text")
@@ -148,9 +143,9 @@ function clickPath(d) {
       .classed("active", focused && function(d) { return d === focused; });
  
   g.transition()
-      .duration(1000)
+      .duration(750)
       .attr("transform", "translate("+ (width/2) +","+ (height/2) +")scale("+ k +")translate("+ (-x) +","+ (-y) +")")
-      .style("stroke-width", 1.75/k +"px");
+      .style("stroke-width", 1/k +"px");
 }
 
 
@@ -161,9 +156,9 @@ function clickText(d) {
   g.selectAll("path")
       .classed("active", 0);
   g.transition()
-      .duration(1000)
+      .duration(750)
       .attr("transform", "scale("+1+")translate("+0+","+0+")")
-      .style("stroke-width", 1.00+"px");
+      .style("stroke-width", 1+"px");
 }
 </script>
 
